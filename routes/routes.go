@@ -1,15 +1,22 @@
 package routes
 
 import (
+	"booking-api/controllers"
 	"net/http"
+
 	"github.com/gorilla/mux"
-	"github.com/your_project/controllers"
 )
 
-func SetupRoutes(router *mux.Router) {
-	router.HandleFunc("/users", controllers.CreateUser).Methods("POST")
-	router.HandleFunc("/users/{id}", controllers.DeleteUser).Methods("DELETE")
-	router.HandleFunc("/bookings", controllers.CreateBooking).Methods("POST")
-	router.HandleFunc("/bookings", controllers.GetBookings).Methods("GET")
-	router.HandleFunc("/bookings/{id}", controllers.DeleteBooking).Methods("DELETE")
+func RegisterRoutes() *mux.Router {
+	r := mux.NewRouter()
+
+	//User 
+	r.HandleFunc("/users", controllers.CreateUser).Methods(http.MethodPost)
+	r.HandleFunc("/users/{username}", controllers.DeleteUser).Methods(http.MethodDelete)
+
+	//Booking 
+	r.HandleFunc("/bookings", controllers.CreateBooking).Methods(http.MethodPost)
+	r.HandleFunc("/bookings/{user_id}", controllers.GetBookings).Methods(http.MethodGet)
+
+	return r
 }
