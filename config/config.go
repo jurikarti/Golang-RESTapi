@@ -11,12 +11,12 @@ var DB *gorm.DB
 
 // ConnectDatabase инициализирует соединение с бд
 func ConnectDatabase() {
-    
+    dsn := "host=localhost user=postgres password=btS2RU6r dbname=booking port=5432 sslmode=disable TimeZone=Asia/Shanghai"
+
     var err error
     DB, err = gorm.Open(postgres.Open(dsn), &gorm.Config{})
     if err != nil {
         log.Fatalf("Failed to connect to database: %v", err)
-        dsn := "host=localhost user=postgres password=btS2RU6r dbname=booking port=5432 sslmode=disable TimeZone=Asia/Shanghai"
     }
 
     // AutoMigrate автоматически создаст таблицы, недостающие столбцы и индексы.
@@ -25,6 +25,7 @@ func ConnectDatabase() {
     }
 }
 
+// CloseDatabase закрывает соединение с базой данных
 func CloseDatabase() {
     sqlDB, err := DB.DB()
     if err != nil {
