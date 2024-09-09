@@ -37,8 +37,11 @@
 
    ```bash
    git clone https://github.com/xtela/Golang-RESTapi.git
+
    cd Golang-RESTapi
+
    go mod download
+   
    Настройте подключение к базе данных в config/database.go:
         dsn := "host=localhost user=youruser password=yourpassword dbname=yourdb port=5432 sslmode=disable TimeZone=Asia/Shanghai"
 
