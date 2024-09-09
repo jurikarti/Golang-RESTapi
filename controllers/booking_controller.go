@@ -5,14 +5,23 @@ import (
 	"booking-api/repository"
 	"encoding/json"
 	"net/http"
-	"strconv" // Импортируем пакет strconv
+	"strconv"
 
 	"github.com/gorilla/mux"
 )
 
+// создай
 func CreateBooking(w http.ResponseWriter, r *http.Request) {
 	var booking models.Booking
-	json.NewDecoder(r.Body).Decode(&booking)
+	if err := json.NewDecoder(r.Body).Decode(&booking); err != nil {
+		http.Error(w, "Invalid input", http.StatusBadRequest)
+		return
+	}
+
+	if err := booking.Validate(); err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
 
 	if err := repository.CreateBooking(&booking); err != nil {
 		http.Error(w, "Error creating booking", http.StatusInternalServerError)
@@ -21,7 +30,8 @@ func CreateBooking(w http.ResponseWriter, r *http.Request) {
 
 	w.WriteHeader(http.StatusCreated)
 }
-
+ 
+// дай
 func GetBookings(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	userIDStr := vars["user_id"]
