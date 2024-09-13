@@ -2,21 +2,22 @@ package routes
 
 import (
 	"booking-api/controllers"
-	"net/http"
-
-	"github.com/gorilla/mux"
+	"github.com/gin-gonic/gin"
+	_ "booking-api/docs" // Swagger docs
+	ginSwagger "github.com/swaggo/gin-swagger"
+	swaggerFiles "github.com/swaggo/files"
 )
 
-func RegisterRoutes() *mux.Router {
-	r := mux.NewRouter()
+// RegisterRoutes регистрирует маршруты с использованием Gin
+func RegisterRoutes(r *gin.Engine) {
+	// Swagger endpoint
+	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 
-	//User 
-	r.HandleFunc("/users", controllers.CreateUser).Methods(http.MethodPost)
-	r.HandleFunc("/users/{username}", controllers.DeleteUser).Methods(http.MethodDelete)
+	// user
+	r.POST("/users", controllers.CreateUser)
+	r.DELETE("/users/:username", controllers.DeleteUser)
 
-	//Booking 
-	r.HandleFunc("/bookings", controllers.CreateBooking).Methods(http.MethodPost)
-	r.HandleFunc("/bookings/{user_id}", controllers.GetBookings).Methods(http.MethodGet)
-
-	return r
+	// bookings
+	r.POST("/bookings", controllers.CreateBooking)
+	r.GET("/bookings/:user_id", controllers.GetBookings)
 }

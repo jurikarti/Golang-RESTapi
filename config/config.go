@@ -11,7 +11,11 @@ var DB *gorm.DB
 
 // ConnectDatabase инициализирует соединение с бд
 func ConnectDatabase() {
+    // запуск без докера
     dsn := "host=localhost user=postgres password=btS2RU6r dbname=booking port=5432 sslmode=disable TimeZone=Asia/Shanghai"
+
+    //запуск для докера
+    //dsn := "host=host.docker.internal user=postgres password=btS2RU6r dbname=booking port=5432 sslmode=disable TimeZone=Asia/Shanghai"
 
     var err error
     DB, err = gorm.Open(postgres.Open(dsn), &gorm.Config{})

@@ -3,50 +3,66 @@ package controllers
 import (
 	"booking-api/models"
 	"booking-api/repository"
-	"encoding/json"
+	"github.com/gin-gonic/gin"
 	"net/http"
 	"strconv"
-
-	"github.com/gorilla/mux"
 )
 
-// создай
-func CreateBooking(w http.ResponseWriter, r *http.Request) {
+// CreateBooking godoc
+// @Summary Create a new booking
+// @Description Create a new booking with the input payload
+// @Tags bookings
+// @Accept  json
+// @Produce  json
+// @Param booking body models.Booking true "Create Booking"
+// @Success 201 {object} models.Booking
+// @Failure 400 {string} string "Invalid input"
+// @Failure 500 {string} string "Error creating booking"
+// @Router /bookings [post]
+func CreateBooking(c *gin.Context) {
 	var booking models.Booking
-	if err := json.NewDecoder(r.Body).Decode(&booking); err != nil {
-		http.Error(w, "Invalid input", http.StatusBadRequest)
+	if err := c.ShouldBindJSON(&booking); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid input"})
 		return
 	}
 
 	if err := booking.Validate(); err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
 	if err := repository.CreateBooking(&booking); err != nil {
-		http.Error(w, "Error creating booking", http.StatusInternalServerError)
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Error creating booking"})
 		return
 	}
 
-	w.WriteHeader(http.StatusCreated)
+	c.JSON(http.StatusCreated, booking)
 }
- 
-// дай
-func GetBookings(w http.ResponseWriter, r *http.Request) {
-	vars := mux.Vars(r)
-	userIDStr := vars["user_id"]
+
+// GetBookings godoc
+// @Summary Get bookings by user ID
+// @Description Retrieve bookings for a specific user by user ID
+// @Tags bookings
+// @Produce  json
+// @Param user_id path int true "User ID"
+// @Success 200 {array} models.Booking
+// @Failure 400 {string} string "Invalid user ID"
+// @Failure 500 {string} string "Error retrieving bookings"
+// @Router /bookings/{user_id} [get]
+func GetBookings(c *gin.Context) {
+	userIDStr := c.Param("user_id")
 
 	userID, err := strconv.ParseUint(userIDStr, 10, 32)
 	if err != nil {
-		http.Error(w, "Invalid user ID", http.StatusBadRequest)
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid user ID"})
 		return
 	}
 
 	bookings, err := repository.GetBookingsByUserID(uint(userID))
 	if err != nil {
-		http.Error(w, "Error retrieving bookings", http.StatusInternalServerError)
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Error retrieving bookings"})
 		return
 	}
 
-	json.NewEncoder(w).Encode(bookings)
+	c.JSON(http.StatusOK, bookings)
 }
